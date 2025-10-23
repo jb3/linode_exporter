@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"github.com/jb3/linode_exporter/collector"
 	"github.com/linode/linodego"
@@ -33,7 +34,7 @@ func main() {
 	}
 
 	tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
-	oauth2Client := oauth2.NewClient(nil, tokenSource)
+	oauth2Client := oauth2.NewClient(context.Background(), tokenSource)
 	linodeClient := linodego.NewClient(oauth2Client)
 
 	registry := prometheus.NewRegistry()
@@ -52,18 +53,26 @@ func main() {
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
-		w.Write([]byte(`<html>
+		_, err := w.Write([]byte(`<html>
 <head><title>Linode Exporter</title></head>
 <body>
 <h1>Linode Exporter</h1>
 <p><a href='` + *metricsPath + `'>Metrics</a></p>
 </body>
 </html>`))
+
+		if err != nil {
+			log.Fatal("Could not return response to client for index route.")
+		}
 	})
 
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
+		_, err := w.Write([]byte("OK"))
+
+		if err != nil {
+			log.Fatal("Could not return response to client for healthcheck.")
+		}
 	})
 
 	log.Printf("Starting Linode exporter on %s", *listenAddress)
