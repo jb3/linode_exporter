@@ -1,0 +1,32 @@
+name: Docker Build
+
+on:
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Docker Build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Fetch build ID
+        id: build_id
+        run: |
+          build_id=$(./scripts/build_id.sh)
+          echo "build_id=$build_id" >> $GITHUB_OUTPUT
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: ${{ github.ref == 'refs/heads/main' }}
+          cache-to: type=inline
+          cache-from: type=registry,ref=ghcr.io/jb3/linode_exporter:latest
+          tags: |
+            ghcr.io/jb3/linode_exporter:latest
+            ghcr.io/jb3/linode_exporter:${{ steps.build_id.outputs.build_id }}
