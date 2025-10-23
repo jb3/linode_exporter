@@ -16,3 +16,11 @@ jobs:
   test:
     name: Test
     uses: ./.github/workflows/test.yml
+
+  build:
+    name: Build
+    uses: ./.github/workflows/build.yml
+
+  build-docker:
+    needs: [lint, test, build]
+    uses: ./.github/workflows/build-docker.yml
