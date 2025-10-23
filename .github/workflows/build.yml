@@ -1,0 +1,19 @@
+name: Build
+
+on:
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: stable
+      - name: Build application
+        run: go build cmd/linode_exporter.go
