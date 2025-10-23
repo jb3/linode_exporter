@@ -1,12 +1,12 @@
-name: Lint
+name: Test
 
 on:
   workflow_call:
 
 jobs:
-  lint:
+  test:
     runs-on: ubuntu-latest
-    name: Lint
+    name: Test
 
     steps:
       - name: Checkout repository
@@ -15,7 +15,5 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version: stable
-      - name: GolangCI Lint
-        uses: golangci/golangci-lint-action@v8
-        with:
-          version: v2.5
+      - name: Run Go tests
+        run: go test ./...
