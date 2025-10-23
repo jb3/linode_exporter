@@ -4,9 +4,13 @@ on:
   workflow_call:
 
 jobs:
-  test:
+  build-docker:
     runs-on: ubuntu-latest
     name: Docker Build
+
+    permissions:
+      packages: write
+      id-token: write
 
     steps:
       - name: Checkout repository
